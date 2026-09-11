@@ -14,9 +14,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.listycity.ui.theme.ListyCityTheme
+
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Button
+import androidx.compose.ui.unit.sp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +40,7 @@ class MainActivity : ComponentActivity() {
                     CityListScreen(
                         cities = cityRepository.cities,
                         onAddCity = {cityRepository.addCity(it) },
+                        onDeleteCity = {cityRepository.deleteCity(it) },
                         modifier = Modifier.padding(paddingValues = innerPadding)
                     )
                 }
@@ -52,15 +64,20 @@ class CityRepository {
     fun addCity(city: String) {
         _cities.add(city)
     }
+
+    fun deleteCity(city: String) {
+        _cities.remove(city)
+    }
 }
 
 @Composable
 fun CityListScreen(
-    cities:List<String>,
+    cities: List<String>,
     onAddCity: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDeleteCity: (String) -> Unit
 ) {
-    var newCityName by remember {mutableStateOF(value = "") }
+    var newCityName by remember {mutableStateOf(value = "") }
 
     Column(modifier = modifier.fillMaxSize()) {
         Row(modifier = Modifier.padding(all = 16.dp)) {
@@ -83,10 +100,25 @@ fun CityListScreen(
             ) {
                 Text("Add City")
             }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Button(
+                onClick = {
+                    // Fill something here
+                    if (cities.contains(newCityName)) {
+                        onDeleteCity(newCityName)
+                        newCityName = ""
+                    }
+                }
+            ) {
+                Text("Delete City")
+            }
+
         }
     }
 
-    LazyColumn(modfier.fillMaxSize()) {
+    LazyColumn(modifier.fillMaxSize()) {
         items(cities) { city ->
             CityRow(city = city)
         }
